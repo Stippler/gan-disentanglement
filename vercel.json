@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/total-walk.js": {
+    "api/total-walks.js": {
       "includeFiles": "never-match"
     },
     "api/walk.js": {
