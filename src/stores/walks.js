@@ -71,7 +71,14 @@ const useWalks = create((set, get) => ({
     try {
       for (let chunk = 0; chunk < chunks; chunk++) {
         try {
-          const response = await fetch(`/api/walks?space=${space}&direction=${direction}&chunk=${chunk}`, { signal: controller.signal });
+          // const response = await fetch(`/api/walks?space=${space}&direction=${direction}&chunk=${chunk}`, { signal: controller.signal });
+
+          const url = process.env.NODE_ENV === 'production'
+            ? `https://gan-disentanglement.vercel.app/chunks/${space}/${direction}/${chunk}.json`
+            : `http://localhost:3000/chunks/${space}/${direction}/${chunk}.json`;
+
+          const response = await fetch(url, { signal: controller.signal });
+
 
           if (!response.ok) throw new Error("Network response was not ok");
 
@@ -109,7 +116,7 @@ const useWalks = create((set, get) => ({
     const { direction } = get();
     get().setSpaceAndDirection(space, direction);
   },
-  
+
   /**
    * Sets the direction value and triggers the fetch for corresponding walks.
    * @param {string} direction - The direction value.
@@ -125,7 +132,7 @@ const useWalks = create((set, get) => ({
    * @param {string} direction - The direction value.
    */
   setSpaceAndDirection: (space, direction) => {
-    if(get().loading){
+    if (get().loading) {
       // throw Error("already loading...");
       console.log("already loading...")
       return;
