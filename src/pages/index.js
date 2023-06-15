@@ -121,7 +121,7 @@ export default function Home() {
               <img src="/images/tut1.png" alt="description" style={{ width: '100%' }} />
             </Grid>
           </Grid>
-          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Own Implementation</Typography></Divider>
+          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Detail Implementation</Typography></Divider>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography variant="body1" color="text.secondary" paragraph>

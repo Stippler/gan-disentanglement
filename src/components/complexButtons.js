@@ -136,12 +136,12 @@ export default function ButtonBases() {
     const images = [
         {
             url: '/images/paper.png',
-            title: 'Paper Implementation',
+            title: 'Overview',
             route: '/paper'
         },
         {
             url: '/images/detail.png',
-            title: 'Walk',
+            title: 'Detail',
             route: `/${getRandomSpace()}/${getRandomAttribute()}/${getRandomNumber()}`
         },
     ];
