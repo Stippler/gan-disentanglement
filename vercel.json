@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/total-walk.js": {
+      "includeFiles": "never-match"
+    },
+    "api/walk.js": {
+      "includeFiles": "never-match"
+    },
+    "api/walks.js": {
+      "includeFiles": "never-match"
+    },
+    "api/walksdb.js": {
+      "includeFiles": "never-match"
+    }
+  }
+}
