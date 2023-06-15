@@ -13,6 +13,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import DescriptionIcon from '@mui/icons-material/Description';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
+import VideosContainer from '@component/components/videoContainer';
 
 
 
@@ -55,6 +56,9 @@ export default function Home() {
               >
                 GAN Disentanglement: Unraveling the Complexities of Generative Networks
               </Typography>
+            </Grid>
+            <Grid item>
+              <VideosContainer/>
             </Grid>
             <Grid item xs={12}>
               <ButtonBases />
