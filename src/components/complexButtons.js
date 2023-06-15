@@ -5,23 +5,7 @@ import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import { useRouter } from 'next/router';
 
-/**
- * Array of image objects with their URLs, titles, and routes.
- *
- * @type {Array}
- */
-const images = [
-    {
-        url: '/images/paper.png',
-        title: 'Paper Reimplementation',
-        route: '/paper'
-    },
-    {
-        url: '/images/detail.png',
-        title: 'Own Implementation',
-        route: '/selection'
-    },
-];
+
 
 /**
  * Custom styled component for the image button.
@@ -110,6 +94,58 @@ const ImageMarked = styled('span')(({ theme }) => ({
 export default function ButtonBases() {
     const router = useRouter();
 
+    const attributes = [
+        "Arched_Eyebrows",
+        "Bags_Under_Eyes",
+        "Bald",
+        "Bangs",
+        "Big_Lips",
+        "Black_Hair",
+        "Blond_Hair",
+        "Brown_Hair",
+        "Bushy_Eyebrows",
+        "Chubby",
+        "Double_Chin",
+        "Eyeglasses",
+        "Goatee",
+        "Gray_Hair",
+        "Heavy_Makeup",
+        "High_Cheekbones",
+        "Male",
+        "Mouth_Slightly_Open",
+        "Mustache",
+        "No_Beard",
+        "Pale_Skin",
+        "Receding_Hairline",
+        "Sideburns",
+        "Smiling",
+        "Straight_Hair",
+        "Wavy_Hair",
+        "Wearing_Earrings",
+        "Wearing_Hat",
+        "Wearing_Lipstick",
+        "Young"
+    ]
+
+    const spaces = ['z', 'w'];
+
+    const getRandomSpace = () => spaces[Math.floor(Math.random() * spaces.length)];
+    const getRandomAttribute = () => attributes[Math.floor(Math.random() * attributes.length)];
+    const getRandomNumber = () => Math.floor(Math.random() * 100);
+
+    const images = [
+        {
+            url: '/images/paper.png',
+            title: 'Paper Implementation',
+            route: '/paper'
+        },
+        {
+            url: '/images/detail.png',
+            title: 'Walk',
+            route: `/${getRandomSpace()}/${getRandomAttribute()}/${getRandomNumber()}`
+        },
+    ];
+
     /**
      * Renders image buttons based on the data in the 'images' array.
      *
@@ -122,9 +158,9 @@ export default function ButtonBases() {
                     focusRipple
                     key={image.title}
                     style={{
-                        width:'100%', 
+                        width: '100%',
                     }}
-                    onClick={()=>{
+                    onClick={() => {
                         router.push(image.route);
                     }}
                 >
