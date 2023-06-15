@@ -11,6 +11,9 @@ import ButtonBases from '@component/components/complexButtons';
 import Divider from '@mui/material/Divider';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import DescriptionIcon from '@mui/icons-material/Description';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+
 
 
 /**
@@ -32,6 +35,11 @@ export default function Home() {
           <Typography variant="h6" color="inherit" noWrap>
             VIS 2
           </Typography>
+          <Breadcrumbs aria-label="breadcrumb" sx={{pl:4}} color="#FFF">
+            <Link color="#FFF" href="/" underline="hover">
+              Home
+            </Link>
+          </Breadcrumbs>
         </Toolbar>
       </AppBar>
       <main className={styles.main}>

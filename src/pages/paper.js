@@ -22,6 +22,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
 
 function linspace(start, end, n) {
   const diff = end - start;
@@ -109,6 +111,7 @@ export default function PaperPage() {
   const setSpaceAndDirection = useWalks(state => state.setSpaceAndDirection);
   const space = useWalks(state => state.space);
   const path = `/videos/${space}/${direction}/${walk}.mp4`;
+  
 
   const handleSpaceChange = (event) => {
     setSpace(event.target.value);
@@ -127,8 +130,16 @@ export default function PaperPage() {
         <Toolbar>
           <PersonSearchIcon sx={{ mr: 2 }} />
           <Typography variant="h6" color="inherit" noWrap>
-            VISUALIZATION
+            Vis 2
           </Typography>
+          <Breadcrumbs aria-label="breadcrumb" sx={{pl:4}} color="#FFF">
+            <Link color="#FFF" href="/" underline="hover">
+              Home
+            </Link>
+            <Link color="#FFF" underline="hover">
+              Overview
+            </Link>
+          </Breadcrumbs>
         </Toolbar>
       </AppBar>
       <main>
