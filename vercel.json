@@ -1,16 +1,8 @@
 {
   "functions": {
-    "api/total-walks.js": {
-      "includeFiles": "never-match"
-    },
-    "api/walk.js": {
-      "includeFiles": "never-match"
-    },
-    "api/walks.js": {
-      "includeFiles": "never-match"
-    },
-    "api/walksdb.js": {
-      "includeFiles": "never-match"
-    }
+    "src/pages/api/total-walks.js": { "includeFiles": "", "excludeFiles": "**/*" },
+    "src/pages/api/walk.js": { "includeFiles": "", "excludeFiles": "**/*" },
+    "src/pages/api/walks.js": { "includeFiles": "", "excludeFiles": "**/*" },
+    "src/pages/api/walksdb.js": { "includeFiles": "", "excludeFiles": "**/*" }
   }
 }
