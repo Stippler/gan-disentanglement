@@ -96,7 +96,7 @@ export default function VideoCard({ path }) {
                     component="video"
                     src={videoPath}
                     ref={videoRef}
-                    title="green iguana"
+                    title={`Direction: ${direction.replaceAll('_', ' ')}`}
                 />
             </Box>
             <IconButton

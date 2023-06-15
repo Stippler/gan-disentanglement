@@ -101,8 +101,8 @@ const Walk = ({ space, direction, walk }) => {
      * Update the video players' current time based on the slider values.
      */
     useEffect(() => {
-        const startSec = start / 20;
-        const endSec = end / 20;
+        const startSec = start / 20.0;
+        const endSec = end / 20.0;
         const delta = endSec - startSec;
         videos.forEach(videoData => {
             let video = videoData.ref.current;
@@ -111,7 +111,7 @@ const Walk = ({ space, direction, walk }) => {
                 video.currentTime = newTime;
             }
         });
-    }, [start, end, ...videos.map(video => video.ref)]);
+    }, [start, end, ...videos]);
 
     const minDistance = 1;
 
