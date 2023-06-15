@@ -211,7 +211,7 @@ export default function Home() {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <img src="/images/tut2.png" alt="description" style={{ width: '100%' }} />
+              <img src="/images/tut3.png" alt="description" style={{ width: '100%' }} />
             </Grid>
 
           </Grid>
