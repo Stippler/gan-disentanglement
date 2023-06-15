@@ -60,7 +60,7 @@ const ImageStripe = ({ videos, path }) => {
                             component="video"
                             src={path}
                             ref={video.ref}
-                            title="green iguana"
+                            title="Image Stripe"
                             sx={{ width: '100%' }}
                         />
                     </Box>
