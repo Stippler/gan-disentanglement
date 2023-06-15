@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>GAN Disentanglement</h1>
+<p>Welcome to the world of Generative Adversarial Networks (GANs) disentanglement! Before we begin, please note that this code has only been tested on Ubuntu 20.04 with RTX 3090 Ti graphics card.
+This readme contains a detailed step-by-step tutorial that would guide you through starting the frontend and the data generation part.</p>
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#download-data">Download Data</a></li>
+<li><a href="#frontend">Frontend</a></li>
+<li><a href="#data-generation">Data Generation</a></li>
+</ol>
+<h2>Download Data <a name="download-data"></a></h2>
+<p>Navigating the labyrinth of StyleGANs set-up may seem like a Herculean task, given its intricate web of dependencies and the need for precise version compatibility.
+Add to this the time-consuming data generation that could potentially take days and the hardware requirement of a high-end graphics card, and you're looking at a veritable odyssey of GAN disentanglement.</p>
+<p>Doesn't that sound like an action-packed adventure?
+Well, if for some reason, you'd prefer to skip this exhilarating challenge, we've got your back.
+We offer you the 'Download Data' express ticket!
+<a href="https://owncloud.tuwien.ac.at/index.php/s/CWduw7BT5vUYMB9">Click Here</a> for access to the data.</p>
+<h2>Frontend <a name="frontend"></a></h2>
+<p><strong>Step 1: Install Node Version Manager (nvm)</strong></p>
+<p>Start by installing Node Version Manager (nvm), an indispensable tool for managing multiple Node.js versions. Run the following command:</p>
+<pre class="prettyprint source lang-bash"><code># Fetch the nvm installation script and execute it
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+</code></pre>
+<p>This command downloads and runs the installation script directly from the official nvm GitHub repository. Upon completion, nvm is installed on your system, ready to help manage your Node.js versions.</p>
+<p>Next, install a specific version of Node.js using nvm. For instance, to install Node.js version 20, you can run:</p>
+<pre class="prettyprint source lang-bash"><code># Use nvm to install Node.js version 20
+nvm install 20
+</code></pre>
+<p><strong>Step 2: Install dependencies</strong></p>
+<p>With Node.js setup, it's time to prepare the project environment. Navigate to your project directory and run:</p>
+<pre class="prettyprint source lang-bash"><code># navigate to your project
+cd path/to/app
+# Install dependencies
+npm install
+</code></pre>
+<p>This command reads the package.json file in your project directory and installs all the dependencies listed there into a folder named node_modules.</p>
+<p><strong>Step 3: Build and start the project</strong></p>
+<p>Once you're ready to take your project live, you need to build it for production:</p>
+<pre class="prettyprint source lang-bash"><code># Build the project for production
+npm run build
+</code></pre>
+<p>This command typically bundles your code, minifies it, and performs other optimizations to ensure your application runs efficiently in a production environment. When the build process is completed successfully, it's time to start your application:</p>
+<pre class="prettyprint source lang-bash"><code># Start the application in production mode
+npm run start
+</code></pre>
+<p>This command launches your built application, ready to serve incoming requests from users. Congratulations, your project setup is complete and your application is live!</p>
+<p><strong>Step 4: Start the development server</strong></p>
+<p>After all dependencies are installed, let's fire up the development server with:</p>
+<pre class="prettyprint source lang-bash"><code># Start the development server
+npm run dev
+</code></pre>
+<p>This command usually starts a local development server with features like hot reloading, which means your application will automatically refresh whenever you make changes to the source code.</p>
+<h2>Data Generation <a name="data-generation"></a></h2>
+<p>The process of data generation consists of several steps, starting from setting up the necessary environment, downloading pretrained models, and generating the required data.</p>
+<ol>
+<li>Clone the repository <a href="https://github.com/NVlabs/stylegan2-ada-pytorch">stylegan2-ada-pytorch</a> and set up the environment according to the instructions in the readme of the repository and copy the scripts:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>git clone https://github.com/NVlabs/stylegan2-ada-pytorch
+cd stylegan2-ada-pytorch
+# Proceed with the setup according to the repository's README.
+cp -r ../scripts/* .
+</code></pre>
+<ol start="2">
+<li>Download the <a href="https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/transfer-learning-source-nets/ffhq-res256-mirror-paper256-noaug.pkl">256x256 ffhq model</a>, create a directory named 'pretrained_models', and place the model weights in it:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>mkdir pretrained_models
+cd pretrained_models
+wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/transfer-learning-source-nets/ffhq-res256-mirror-paper256-noaug.pkl -O ffhq.pkl
+cd ..
+</code></pre>
+<ol start="3">
+<li>Generate the training data by executing the following command:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>python generate_walks.py --trunc=0.7 --outdir=out
+</code></pre>
+<ol start="4">
+<li>
+<p>In parallel, you can train the MobileNet classifier using the <code>classification_multimodel.ipynb</code> as a starting point. Ensure to place all model checkpoints in the correct folder at the end following the naming convention: <code>mobile_mobile_nets/{direction}.pt</code>.</p>
+</li>
+<li>
+<p>Run <code>directions_z.py</code> and <code>directions_w.py</code> to train the directions for the walks:</p>
+</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>python directions_z.py
+python directions_w.py
+</code></pre>
+<ol start="6">
+<li>Generate the walks using <code>generate_walks.py</code>:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>python generate_walks.py -s w
+python generate_walks.py -s z
+</code></pre>
+<ol start="7">
+<li>Go to the frontend folder and create a database:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>cd frontend
+npx prisma db push
+cd ..
+</code></pre>
+<ol start="8">
+<li>Use <code>insert.py</code> to add the classifications to the database:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>python insert.py --img_dir=out/walks/z --space=z
+python insert.py --img_dir=out/walks/w --space=w
+</code></pre>
+<ol start="9">
+<li>Generate videos using <code>generate_videos.py</code>:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>python generate_videos.py --walk_type=w
+python generate_videos.py --walk_type=z
+</code></pre>
+<ol start="10">
+<li>Finally, spin up the frontend in the <code>app</code> directory and execute <code>add_jsons.py</code> to convert the data from the SQLite database to JSON chunks for faster loading:</li>
+</ol>
+<pre class="prettyprint source lang-bash"><code>cd app
+python add_jsons.py
+</code></pre>
+<p>Congratulations! You should now have a <code>chunks</code> folder which you can move into <code>app</code>, and a <code>videos</code> folder which you can move into <code>app/public</code>. You are now ready to analyze the GAN disentanglement with the application.</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#FilterDialog">FilterDialog</a></li><li><a href="global.html#HtmlTooltip">HtmlTooltip</a></li><li><a href="global.html#Image">Image</a></li><li><a href="global.html#ImageBackdrop">ImageBackdrop</a></li><li><a href="global.html#ImageButton">ImageButton</a></li><li><a href="global.html#ImageMarked">ImageMarked</a></li><li><a href="global.html#ImageSrc">ImageSrc</a></li><li><a href="global.html#LineChart">LineChart</a></li><li><a href="global.html#LineChartDisplay">LineChartDisplay</a></li><li><a href="global.html#RadarChart">RadarChart</a></li><li><a href="global.html#RadarChartDisplay">RadarChartDisplay</a></li><li><a href="global.html#RegressionScatterplot">RegressionScatterplot</a></li><li><a href="global.html#Scatterplot">Scatterplot</a></li><li><a href="global.html#UmapDisplay">UmapDisplay</a></li><li><a href="global.html#Walk">Walk</a></li><li><a href="global.html#accessoiresAtt">accessoiresAtt</a></li><li><a href="global.html#calculateLinearRegressions">calculateLinearRegressions</a></li><li><a href="global.html#faceFeaturesAtt">faceFeaturesAtt</a></li><li><a href="global.html#facialHairAtt">facialHairAtt</a></li><li><a href="global.html#generalAtt">generalAtt</a></li><li><a href="global.html#generateLineChart">generateLineChart</a></li><li><a href="global.html#generateRadarChart">generateRadarChart</a></li><li><a href="global.html#generateScatterplot">generateScatterplot</a></li><li><a href="global.html#getWalk">getWalk</a></li><li><a href="global.html#getWalks">getWalks</a></li><li><a href="global.html#hairAtt">hairAtt</a></li><li><a href="global.html#images">images</a></li><li><a href="global.html#linspace">linspace</a></li><li><a href="global.html#radarAngle">radarAngle</a></li><li><a href="global.html#radarX">radarX</a></li><li><a href="global.html#radarY">radarY</a></li><li><a href="global.html#scale">scale</a></li><li><a href="global.html#setCurrent">setCurrent</a></li><li><a href="global.html#setDirection">setDirection</a></li><li><a href="global.html#setEnd">setEnd</a></li><li><a href="global.html#setError">setError</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setSelectedWalks">setSelectedWalks</a></li><li><a href="global.html#setSpace">setSpace</a></li><li><a href="global.html#setSpaceAndDirection">setSpaceAndDirection</a></li><li><a href="global.html#setSpaceDirectionWalk">setSpaceDirectionWalk</a></li><li><a href="global.html#setStart">setStart</a></li><li><a href="global.html#topAttributes">topAttributes</a></li><li><a href="global.html#useWalk">useWalk</a></li><li><a href="global.html#useWalks">useWalks</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Jun 15 2023 21:42:06 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

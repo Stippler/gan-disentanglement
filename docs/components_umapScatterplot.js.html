@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/umapScatterplot.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/umapScatterplot.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useRef } from "react";
+import * as d3 from "d3";
+import { styled } from '@mui/material/styles';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import useWalks from "@component/stores/walks";
+import { CHART_COLORS } from "./colors";
+
+/**
+ * Styled component for custom HTML tooltip.
+ */
+const HtmlTooltip = styled(({ className, ...props }) => (
+    &lt;Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`&amp; .${tooltipClasses.tooltip}`]: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+    },
+  }));
+
+/**
+ * Generates the scatterplot chart for umap projection.
+ * @param {Object} ref - The reference to the chart container holding the svgs.
+ * @param {Array} walks - The array of walks data.
+ * @param {Array} selectedWalks - The array of selected walks to color the selection made by the user through brushing or clicking.
+ * @param {Function} setSelectedWalks - The function to set the selected walks to save for other charts.
+ */
+const generateScatterplot = (ref, walks, selectedWalks, setSelectedWalks) => {
+
+    const primary = CHART_COLORS.primary;
+    const secondary = CHART_COLORS.secondary;
+
+    const margin = { top: 15, right: 60, bottom: 30, left: 40 };
+    const width = 600 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
+
+    d3.select(ref.current).selectAll("svg").remove();
+
+    const minX = d3.min(walks, d => +d['umap'][0]);
+    const maxX = d3.max(walks, d => +d['umap'][0]);
+
+    const minY = d3.min(walks, d => +d['umap'][1]);
+    const maxY = d3.max(walks, d => +d['umap'][1]);
+
+    // create scales for the x and y axes
+    const xScale = d3
+        .scaleLinear()
+        .domain([minX-(maxX-minX)*0.1, maxX+(maxX-minX)*0.1])
+        .range([0, width]);
+
+    const yScale = d3
+        .scaleLinear()
+        .domain([minY-(maxY-minY)*0.1, maxY+(maxY-minY)*0.1])
+        .range([height, 0]);
+
+    // create the x and y axes
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+
+    // create the scatterplot
+    const svg = d3
+        .select(ref.current)
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+
+    const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    g.append("g").attr("transform", `translate(0,${height})`).call(xAxis);
+    g.append("g").call(yAxis);
+
+    /**
+     * Click event handler for scatterplot circles.
+     * @param {Object} event - The click event object.
+     * @param {Object} d - The data associated with the clicked circle.
+     */
+    const handleClick = (event, d) => {
+        const newSelectedWalks = [d.walk];
+        setSelectedWalks(newSelectedWalks);
+
+        svg
+            .selectAll('.scatterplot-circle')
+            .attr('fill', d => (newSelectedWalks.includes(d.walk) ? primary : secondary));
+
+        d3.select(event.currentTarget)
+            .attr('fill', primary)
+    }
+
+    const brush = d3.brush()
+        .extent([[0, 0], [width, height]])
+        .on("end", function handleBrush(event) {
+            if (!event.selection) {
+                setSelectedWalks([]);
+            } else {
+                const [[x1, y1], [x2, y2]] = event.selection;
+                const selected = walks.filter(d => {
+                    const dx = xScale(d['umap'][0]), dy = yScale(d['umap'][1]);
+                    return x1 &lt;= dx &amp;&amp; dx &lt;= x2 &amp;&amp; y1 &lt;= dy &amp;&amp; dy &lt;= y2;
+                }).map(d => d.walk);
+                setSelectedWalks(selected);
+            }
+            // update the fill of circles
+            g.selectAll('.scatterplot-circle')
+                .attr('fill', d => selectedWalks.includes(d.walk) ? primary : secondary);
+        });
+
+    g.append("g")
+        .attr("class", "brush")
+        .call(brush);
+
+    // add circles after brush to still enable clicking event
+    g
+        .selectAll("circle")
+        .data(walks)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => xScale(+d['umap'][0]))
+        .attr("cy", (d) => yScale(+d['umap'][1]))
+        .attr("r", 4)
+        .attr("fill", (d) => (selectedWalks.includes(d.walk) ? primary : secondary)) // Change fill color based on condition
+        .on("click", handleClick)
+        .attr("class", "scatterplot-circle");
+};
+
+/**
+ * UMAP Scatterplot component.
+ * Displays the UMAP scatterplot chart.
+ * @returns {JSX.Element} UMAP scatterplot component.
+ */
+const Scatterplot = () => {
+    const chartRef = useRef();
+
+    const walks = useWalks(state => state.walks);
+    const selectedWalks = useWalks(state => state.selectedWalks);
+    const setSelectedWalks = useWalks(state => state.setSelectedWalks);
+
+    useEffect(() => {
+        if (walks) {
+            generateScatterplot(chartRef, walks, selectedWalks, setSelectedWalks);
+        }
+    }, [walks, selectedWalks]);
+
+    return (
+        &lt;>
+            &lt;div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                &lt;Typography variant="h6" component="div" style={{flexGrow: 1, textAlign: 'center'}}>Umap&lt;/Typography>
+                &lt;HtmlTooltip
+                    title={
+                    &lt;>
+                        &lt;Typography color="primary">UMAP Plot&lt;/Typography>
+                        {/* your explanation goes here */}
+                        &lt;p>
+                            The UMap-projection acts as a window for selecting walks in terms of similarity in their activations. 
+                            This representation of the walks is decoupled from the information that regression provides, and enables cross-examination of walks in two different representation. 
+                        &lt;/p>
+                        &lt;br/>
+                        &lt;p>&lt;b>Click:&lt;/b>  to select a datapoint&lt;/p>
+                        &lt;p>&lt;b>Brush:&lt;/b>  to select multiple datapoints&lt;/p>
+                    &lt;/>
+                    }
+                >
+                    &lt;IconButton>
+                        &lt;HelpOutlineIcon/>
+                    &lt;/IconButton>
+                &lt;/HtmlTooltip>
+            &lt;/div>
+            &lt;svg
+                viewBox={"0 0 " + 600 + " " + 400}
+                ref={chartRef}
+            />
+        &lt;/>
+    );
+};
+export default Scatterplot;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#FilterDialog">FilterDialog</a></li><li><a href="global.html#HtmlTooltip">HtmlTooltip</a></li><li><a href="global.html#Image">Image</a></li><li><a href="global.html#ImageBackdrop">ImageBackdrop</a></li><li><a href="global.html#ImageButton">ImageButton</a></li><li><a href="global.html#ImageMarked">ImageMarked</a></li><li><a href="global.html#ImageSrc">ImageSrc</a></li><li><a href="global.html#LineChart">LineChart</a></li><li><a href="global.html#LineChartDisplay">LineChartDisplay</a></li><li><a href="global.html#RadarChart">RadarChart</a></li><li><a href="global.html#RadarChartDisplay">RadarChartDisplay</a></li><li><a href="global.html#RegressionScatterplot">RegressionScatterplot</a></li><li><a href="global.html#Scatterplot">Scatterplot</a></li><li><a href="global.html#UmapDisplay">UmapDisplay</a></li><li><a href="global.html#Walk">Walk</a></li><li><a href="global.html#accessoiresAtt">accessoiresAtt</a></li><li><a href="global.html#calculateLinearRegressions">calculateLinearRegressions</a></li><li><a href="global.html#faceFeaturesAtt">faceFeaturesAtt</a></li><li><a href="global.html#facialHairAtt">facialHairAtt</a></li><li><a href="global.html#generalAtt">generalAtt</a></li><li><a href="global.html#generateLineChart">generateLineChart</a></li><li><a href="global.html#generateRadarChart">generateRadarChart</a></li><li><a href="global.html#generateScatterplot">generateScatterplot</a></li><li><a href="global.html#getWalk">getWalk</a></li><li><a href="global.html#getWalks">getWalks</a></li><li><a href="global.html#hairAtt">hairAtt</a></li><li><a href="global.html#images">images</a></li><li><a href="global.html#linspace">linspace</a></li><li><a href="global.html#radarAngle">radarAngle</a></li><li><a href="global.html#radarX">radarX</a></li><li><a href="global.html#radarY">radarY</a></li><li><a href="global.html#scale">scale</a></li><li><a href="global.html#setCurrent">setCurrent</a></li><li><a href="global.html#setDirection">setDirection</a></li><li><a href="global.html#setEnd">setEnd</a></li><li><a href="global.html#setError">setError</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setSelectedWalks">setSelectedWalks</a></li><li><a href="global.html#setSpace">setSpace</a></li><li><a href="global.html#setSpaceAndDirection">setSpaceAndDirection</a></li><li><a href="global.html#setSpaceDirectionWalk">setSpaceDirectionWalk</a></li><li><a href="global.html#setStart">setStart</a></li><li><a href="global.html#topAttributes">topAttributes</a></li><li><a href="global.html#useWalk">useWalk</a></li><li><a href="global.html#useWalks">useWalks</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Jun 15 2023 21:42:06 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

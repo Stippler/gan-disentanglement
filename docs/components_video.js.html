@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/video.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/video.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as React from 'react';
+import Card from '@mui/material/Card';
+import CardMedia from '@mui/material/CardMedia';
+import Button from '@mui/material/Button';
+import { Box } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import useWalk from '@component/stores/walk';
+
+/**
+ * VideoCard component for walk animation.
+ * Displays a card with a video player and play/pause button.
+ * @param {string} path - The path to the video file.
+ * @returns {JSX.Element} VideoCard component.
+ */
+export default function VideoCard({ path }) {
+    const videoRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false); // New state for Play and Pause
+    // const end = useWalk(state => state.end);
+    const setCurrent = useWalk(state => state.setCurrent);
+    const current = useWalk(state => state.current);
+    const end = useWalk(state => state.end);
+    const videoPath = path;
+
+    /**
+     * Toggles between play and pause of the video.
+     */
+    const togglePlayPause = () => { // New method for Play and Pause
+        if (isPlaying) {
+            videoRef.current.pause();
+        } else {
+            videoRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    useEffect(() => {
+        const video = videoRef.current;
+        let lastUpdateTime = 0;
+        if (video) {
+            // Update the slider's max value whenever the video's duration changes
+            video.onloadedmetadata = () => {
+                // setEnd(99);
+            };
+
+            video.ontimeupdate = () => {
+                let currentUpdateTime = video.currentTime * 20;
+                if (currentUpdateTime > end) {
+                    setIsPlaying(false);
+                    setCurrent(end);
+                    video.pause();
+                } else {
+                    setCurrent(Math.floor(currentUpdateTime));
+                }
+                lastUpdateTime = currentUpdateTime;
+            };
+            if (!video.isPlaying) {
+                video.currentTime = current / 20;
+            }
+        }
+
+        return () => {
+            if (video) {
+                video.onloadedmetadata = null;
+                video.ontimeupdate = null;
+            }
+        };
+    }, [videoRef, current]);
+
+    return (
+        &lt;Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            &lt;Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                &lt;CardMedia
+                    sx={{ maxWidth: 256 }}
+                    component="video"
+                    src={videoPath}
+                    ref={videoRef}
+                    title="green iguana"
+                />
+                &lt;Button onClick={togglePlayPause}>
+                    {isPlaying ? 'Pause' : 'Play'}
+                &lt;/Button>
+            &lt;/Box>
+        &lt;/Card>
+    );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#FilterDialog">FilterDialog</a></li><li><a href="global.html#HtmlTooltip">HtmlTooltip</a></li><li><a href="global.html#Image">Image</a></li><li><a href="global.html#ImageBackdrop">ImageBackdrop</a></li><li><a href="global.html#ImageButton">ImageButton</a></li><li><a href="global.html#ImageMarked">ImageMarked</a></li><li><a href="global.html#ImageSrc">ImageSrc</a></li><li><a href="global.html#LineChart">LineChart</a></li><li><a href="global.html#LineChartDisplay">LineChartDisplay</a></li><li><a href="global.html#RadarChart">RadarChart</a></li><li><a href="global.html#RadarChartDisplay">RadarChartDisplay</a></li><li><a href="global.html#RegressionScatterplot">RegressionScatterplot</a></li><li><a href="global.html#Scatterplot">Scatterplot</a></li><li><a href="global.html#UmapDisplay">UmapDisplay</a></li><li><a href="global.html#Walk">Walk</a></li><li><a href="global.html#accessoiresAtt">accessoiresAtt</a></li><li><a href="global.html#calculateLinearRegressions">calculateLinearRegressions</a></li><li><a href="global.html#faceFeaturesAtt">faceFeaturesAtt</a></li><li><a href="global.html#facialHairAtt">facialHairAtt</a></li><li><a href="global.html#generalAtt">generalAtt</a></li><li><a href="global.html#generateLineChart">generateLineChart</a></li><li><a href="global.html#generateRadarChart">generateRadarChart</a></li><li><a href="global.html#generateScatterplot">generateScatterplot</a></li><li><a href="global.html#getWalk">getWalk</a></li><li><a href="global.html#getWalks">getWalks</a></li><li><a href="global.html#hairAtt">hairAtt</a></li><li><a href="global.html#images">images</a></li><li><a href="global.html#linspace">linspace</a></li><li><a href="global.html#radarAngle">radarAngle</a></li><li><a href="global.html#radarX">radarX</a></li><li><a href="global.html#radarY">radarY</a></li><li><a href="global.html#scale">scale</a></li><li><a href="global.html#setCurrent">setCurrent</a></li><li><a href="global.html#setDirection">setDirection</a></li><li><a href="global.html#setEnd">setEnd</a></li><li><a href="global.html#setError">setError</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setSelectedWalks">setSelectedWalks</a></li><li><a href="global.html#setSpace">setSpace</a></li><li><a href="global.html#setSpaceAndDirection">setSpaceAndDirection</a></li><li><a href="global.html#setSpaceDirectionWalk">setSpaceDirectionWalk</a></li><li><a href="global.html#setStart">setStart</a></li><li><a href="global.html#topAttributes">topAttributes</a></li><li><a href="global.html#useWalk">useWalk</a></li><li><a href="global.html#useWalks">useWalks</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Jun 15 2023 21:42:06 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
