@@ -1,0 +1,46 @@
+{
+  "name": "gan-disentanglement",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node download-and-extract.js && next dev",
+    "build": "node download-and-extract.js && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.10.7",
+    "@emotion/react": "^11.10.6",
+    "@emotion/server": "^11.10.0",
+    "@emotion/styled": "^11.10.6",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.12.0",
+    "@prisma/client": "^4.12.0",
+    "@sveltejs/adapter-netlify": "^1.0.0-next.88",
+    "@sveltejs/kit": "^1.0.0-next.589",
+    "adm-zip": "^0.5.10",
+    "d3": "^7.8.4",
+    "d3-fetch": "^3.0.1",
+    "eslint": "8.38.0",
+    "eslint-config-next": "13.3.0",
+    "extract-zip": "^2.0.1",
+    "immer": "^10.0.2",
+    "next": "13.3.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "rimraf": "^5.0.0",
+    "simple-statistics": "^7.8.3",
+    "unzipper": "^0.10.11",
+    "zustand": "^4.3.8"
+  },
+  "devDependencies": {
+    "prisma": "^4.15.0"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  }
+  
+}
