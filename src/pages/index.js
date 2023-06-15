@@ -9,6 +9,9 @@ import Container from '@mui/material/Container';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import ButtonBases from '@component/components/complexButtons';
 import Divider from '@mui/material/Divider';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import DescriptionIcon from '@mui/icons-material/Description';
+
 
 /**
  * Home component for documentation and explanation of the visualizations.
@@ -56,12 +59,12 @@ export default function Home() {
                 GANs, robust machine learning models, have gained significant attention for their ability to generate realistic synthetic data. While powerful, the understanding of the latent space that controls the output remains a complex challenge. This project focuses on this area of GANs, often referred to as 'disentanglement', which seeks to separate and independently control the various factors of variation within the model's output.
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph>
-                At its core, we focused on implementing the content of our selected paper 'Interactively Assessing Disentanglement in GANs', harnessing state-of-the-art frontend technologies such as React, Next.js, and MUI.
+                At its core, we focused on implementing the content of our selected paper 'Interactively Assessing Disentanglement in GANs' [1], harnessing state-of-the-art frontend technologies such as React, Next.js, and MUI.
                 Trom there, we developed our own unique concept.
               </Typography>
             </Grid>
           </Grid>
-          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Paper Implementation</Typography></Divider>
+          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Overview Implementation</Typography></Divider>
           <Grid container spacing={2}>
 
             <Grid item xs={12}>
@@ -154,23 +157,96 @@ export default function Home() {
             </Grid>
 
           </Grid>
-          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Data</Typography></Divider>
+
+          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Data Generation</Typography></Divider>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant='body1'></Typography>
+              <Typography variant="body1" color="text.secondary" paragraph>
+                StyleGAN is a cutting-edge Generative Adversarial Network (GAN) developed by Nvidia, designed to generate new, synthetic images that mimic the appearance of real photos.
+                Its architecture introduces a mapping network, transforming an input latent vector 'z' into a style vector 'w', and a style-based generator which crafts new images using 'w'.
+
+                The two distinctive spaces in StyleGAN are the Latent Space 'z' and the Style Space 'w'.
+                The Latent Space 'z' is the initial input space, where each point can be thought of as a seed for image generation.
+                The Style Space 'w', on the other hand, is an intermediate space, achieved by passing 'z' through the mapping network.
+                The transformation from 'z' to 'w' helps disentangle the features of generated images, making it possible to manipulate specific features without affecting others.
+              </Typography>
+
             </Grid>
+
+            <Grid item xs={12} md={6}>
+
+              <Typography variant="h6">1. Image Generation</Typography>
+              <Typography variant="body1" color="text.secondary" paragraph>
+                We begin our data generation process by producing 500,000 images using StyleGAN2 models at a resolution of 256x256 pixels.
+                During this stage, each image's 'z' vector, 'w' vector, and the image itself are saved for further use.
+                This results in an extensive gallery of synthetic images, each associated with their respective latent vectors.
+              </Typography>
+              <Typography variant="h6">2. Attribute Classification</Typography>
+              <Typography variant="body1" color="text.secondary" paragraph>
+                While generating images, we also train 30 MobileNet models on the CelebA dataset.
+                This dataset is rich in diverse celebrity faces, annotated with various facial attributes.
+                Once trained, these MobileNet models classify the 500,000 generated images, providing a categorical understanding of the attributes present in each image.
+              </Typography>
+              <Typography variant="h6">3. Support Vector Machines Training</Typography>
+              <Typography variant="body1" color="text.secondary" paragraph>
+                Our next step involves training Support Vector Machines (SVMs) in both the latent space 'z' and the style space 'w'.
+                The trained SVMs identify decision boundaries separating different classes within the spaces.
+                We then retain the coefficients from the SVMs—these act as normals to the decision boundaries, providing us with a direction for traversing the latent spaces.
+              </Typography>
+              <Typography variant="h6">4. Walks Generation and Classification</Typography>
+              <Typography variant="body1" color="text.secondary" paragraph>
+                We embark on our final step: generating "walks" through the latent spaces.
+                Each walk begins from a random point in the space, and moves in a direction defined by the SVM normals.
+                This movement generates a sequence of images that vary along the attribute associated with that particular direction.
+                The images created during these walks are classified with the trained MobileNet models, ensuring that they represent changes in the anticipated attribute.
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <img src="/images/tut2.png" alt="description" style={{ width: '100%' }} />
+            </Grid>
+
           </Grid>
+
+
+
+
           <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>References</Typography></Divider>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant='body1'></Typography>
+              <Typography variant='body1'>
+                <a
+                  href="https://gan-disentanglement-docs.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}
+                >
+                  <DescriptionIcon sx={{ marginRight: '0.2em', verticalAlign: 'middle' }} color='primary' />
+                  Documentation
+                </a>
+              </Typography>
+              <Typography variant='body1'>
+                <a
+                  href="https://github.com/Stippler/gan-disentanglement"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}
+                >
+                  <GitHubIcon sx={{ marginRight: '0.2em', verticalAlign: 'middle' }} color='primary' />
+                  Code
+                </a>
+              </Typography>
+              <Typography variant='body1'>
+                <br />
+                [1] Jeong, Sangwon, Shusen Liu, and Matthew Berger. "Interactively Assessing Disentanglement in GANs." Computer Graphics Forum. Vol. 41. No. 3. 2022.
+              </Typography>
             </Grid>
           </Grid>
 
         </Container>
-        <Grid container spacing={7}>
+        <Grid container spacing={2} paddingTop={20}>
           <Grid item xs={12}>
-            <Typography variant='h6' textAlign='center' paddingTop={0}>
+            <Typography variant='h6' textAlign='center'>
               GAN Disentanglement
             </Typography>
           </Grid>

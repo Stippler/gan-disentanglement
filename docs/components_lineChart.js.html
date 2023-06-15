@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/lineChart.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/lineChart.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useRef, useEffect, useState } from 'react';
+import * as d3 from 'd3';
+import useWalks from '@component/stores/walks';
+import { CHART_COLORS } from './colors';
+
+/**
+ * Generates a line chart based on the provided data, attribute, and selected walks.
+ *
+ * @param {object} ref - The reference to the chart container.
+ * @param {Array} data - The data used to generate the chart.
+ * @param {string} attribute - Name of the changing attribute in the selected direction.
+ * @param {Array} selectedWalks - Walk selection for filtering (selected in umapScatterplot).
+ */
+const generateLineChart = (ref, data, attribute, selectedWalks) => {
+    const primary = CHART_COLORS.primary;
+    const secondary = CHART_COLORS.secondary;
+    const light_grey = CHART_COLORS.light_grey;
+
+    let slopesValues = [];
+    let walks = [];
+    data.forEach((obj) => {
+        let attrObj = obj.attributes.find(attr => attr.name === attribute);
+        slopesValues.push(attrObj.slope);
+        walks.push(attrObj.steps);
+    });
+
+    let selectedWalksData = walks;
+
+    if (selectedWalks.length > 0) {
+        selectedWalksData = selectedWalks.map((index) => walks[index]);
+        slopesValues = selectedWalks.map((index) => slopesValues[index]);
+    }
+
+    const container = d3.select(ref.current)
+
+    container.select('svg').remove();
+
+    const margin = { top: 40, right: 40, bottom: 0, left: 10 };
+    const width = container.node().clientWidth - margin.right;
+    const height = container.node().clientHeight;
+
+    // line chart settingsflattenWalks
+    const lineChartWidth = width * 0.7 - margin.left;
+    const innerWidth = lineChartWidth - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+
+    // bar chart settings
+    const barChartWidth = width * 0.3 - margin.left;
+    const barChartHeight = height;
+
+    const svg = container
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    // add border
+    svg
+        .append('rect')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('fill', 'none')
+        .attr('stroke', 'grey')
+        .attr('stroke-width', 1);
+
+    // add title
+    svg
+        .append('text')
+        .attr('x', margin.left)
+        .attr('y', margin.top / 2)
+        .text(attribute.replaceAll('_', ' '))
+        .attr('font-size', '12px');
+
+
+    const xScale = d3
+        .scaleLinear()
+        .domain([0, 99])
+        .range([margin.left, lineChartWidth]);
+
+    // const yValues = flattenWalks.map((d) => d);
+    const yScale = d3
+        .scaleLinear()
+        .domain([-1, 1])
+        .range([180, margin.top]);
+
+    const line = d3
+        .line()
+        .x((d, i) => xScale(i))
+        .y((d, i) => yScale(d));
+
+
+    selectedWalksData.forEach((walk) => {
+        svg
+            .append('path')
+            .datum(walk)
+            .attr('fill', 'none')
+            .attr('stroke', 'grey')
+            .attr('stroke-width', 0.5)
+            .attr('d', line);
+    });
+
+    // generate Bar Chart
+
+    const extent = d3.extent(slopesValues);
+    const maxAbsVal = Math.max(Math.abs(extent[0]), Math.abs(extent[1]));
+
+    const thresholds = d3.range(-4, 5, 1).map(d => d * maxAbsVal / 4);
+
+    const bins = d3.bin()
+        .domain([-maxAbsVal, maxAbsVal])
+        .thresholds(thresholds)(slopesValues);
+
+    const numBins = bins.length;
+    const maxLength = d3.max(bins, d => d.length);
+
+    const padding = 0.2;
+
+    const xBarScale = d3
+        .scaleBand()
+        .domain(bins.map(d => d.x0)) // Use the bin start values as the domain
+        .range([0, barChartWidth])
+        .paddingInner(padding)
+        .paddingOuter(padding / 2);
+
+    const yBarScale = d3
+        .scaleLinear()
+        .domain([0, maxLength])
+        .range([barChartHeight, margin.top]);
+
+    const barChartContainer = svg
+        .append('g')
+        .attr('class', 'bar-chart-container')
+        .attr('transform', `translate(${lineChartWidth + margin.left}, 0)`);
+
+    barChartContainer
+        .selectAll('rect')
+        .data(bins)
+        .enter()
+        .append("rect")
+        .attr("x", d => xBarScale(+d.x0))
+        .attr("y", d => yBarScale(+d.length))
+        .attr("height", d => barChartHeight - yBarScale(+d.length))
+        .attr("width", xBarScale.bandwidth())
+        .attr('fill', d => (+d.x0 >= 0 ? secondary : primary));
+
+    svg.append("line")
+        .attr("x1", lineChartWidth)  // x position of the first end of the line
+        .attr("y1", 0)  // y position of the first end of the line
+        .attr("x2", lineChartWidth)  // x position of the second end of the line
+        .attr("y2", height)    // y position of the second end of the line
+        .attr("stroke-width", 1)
+        .attr("stroke", light_grey);
+}
+
+/**
+ * LineChart component displays a line chart based on the provided attribute.
+ *
+ * @param {object} props - The component props.
+ * @param {string} props.attribute - The changing attribute for the line chart.
+ * @returns {JSX.Element} - The LineChart component, displaying a linechart for a single attribute for a selection of walks.
+ */
+export function LineChart({ attribute }) {
+    const chartRef = useRef();
+    const walks = useWalks(state => state.walks);
+    const selectedWalks = useWalks(state => state.selectedWalks);
+
+    // generate line chart after data is loaded
+    useEffect(() => {
+        if (walks.length > 0) {
+            generateLineChart(chartRef, walks, attribute, selectedWalks);
+        }
+    }, [walks, attribute, selectedWalks]);
+
+    return (
+        &lt;svg style={{ width: '300px', height: '110px' }} ref={chartRef} />
+    );
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#FilterDialog">FilterDialog</a></li><li><a href="global.html#HtmlTooltip">HtmlTooltip</a></li><li><a href="global.html#Image">Image</a></li><li><a href="global.html#ImageBackdrop">ImageBackdrop</a></li><li><a href="global.html#ImageButton">ImageButton</a></li><li><a href="global.html#ImageMarked">ImageMarked</a></li><li><a href="global.html#ImageSrc">ImageSrc</a></li><li><a href="global.html#LineChart">LineChart</a></li><li><a href="global.html#LineChartDisplay">LineChartDisplay</a></li><li><a href="global.html#RadarChart">RadarChart</a></li><li><a href="global.html#RadarChartDisplay">RadarChartDisplay</a></li><li><a href="global.html#RegressionScatterplot">RegressionScatterplot</a></li><li><a href="global.html#Scatterplot">Scatterplot</a></li><li><a href="global.html#UmapDisplay">UmapDisplay</a></li><li><a href="global.html#Walk">Walk</a></li><li><a href="global.html#accessoiresAtt">accessoiresAtt</a></li><li><a href="global.html#calculateLinearRegressions">calculateLinearRegressions</a></li><li><a href="global.html#faceFeaturesAtt">faceFeaturesAtt</a></li><li><a href="global.html#facialHairAtt">facialHairAtt</a></li><li><a href="global.html#generalAtt">generalAtt</a></li><li><a href="global.html#generateLineChart">generateLineChart</a></li><li><a href="global.html#generateRadarChart">generateRadarChart</a></li><li><a href="global.html#generateScatterplot">generateScatterplot</a></li><li><a href="global.html#getWalk">getWalk</a></li><li><a href="global.html#getWalks">getWalks</a></li><li><a href="global.html#hairAtt">hairAtt</a></li><li><a href="global.html#images">images</a></li><li><a href="global.html#linspace">linspace</a></li><li><a href="global.html#radarAngle">radarAngle</a></li><li><a href="global.html#radarX">radarX</a></li><li><a href="global.html#radarY">radarY</a></li><li><a href="global.html#scale">scale</a></li><li><a href="global.html#setCurrent">setCurrent</a></li><li><a href="global.html#setDirection">setDirection</a></li><li><a href="global.html#setEnd">setEnd</a></li><li><a href="global.html#setError">setError</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setSelectedWalks">setSelectedWalks</a></li><li><a href="global.html#setSpace">setSpace</a></li><li><a href="global.html#setSpaceAndDirection">setSpaceAndDirection</a></li><li><a href="global.html#setSpaceDirectionWalk">setSpaceDirectionWalk</a></li><li><a href="global.html#setStart">setStart</a></li><li><a href="global.html#topAttributes">topAttributes</a></li><li><a href="global.html#useWalk">useWalk</a></li><li><a href="global.html#useWalks">useWalks</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Jun 15 2023 21:42:06 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
