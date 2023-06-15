@@ -13,6 +13,8 @@ import { Card, CardContent, CardMedia, Slider } from "@mui/material";
 import { RadarChartDisplay } from "@component/components/radarChartDisplay";
 import VideoCard from '@component/components/video';
 import useWalk from '@component/stores/walk';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
 
 /**
  * Generate an array of equally spaced numbers.
@@ -155,8 +157,19 @@ const Walk = ({ space, direction, walk }) => {
                 <Toolbar>
                     <PersonSearchIcon sx={{ mr: 2 }} />
                     <Typography variant="h6" color="inherit" noWrap>
-                        VISUALIZATION - WALK
+                        VIS 2
                     </Typography>
+                    <Breadcrumbs aria-label="breadcrumb" sx={{pl:4}} color="#FFF">
+                        <Link color="#FFF" href="/" underline="hover">
+                        Home
+                        </Link>
+                        <Link color="#FFF" href='/paper' underline="hover">
+                        Overview
+                        </Link>
+                        <Link color="#FFF" underline="hover">
+                        Detail
+                        </Link>
+                    </Breadcrumbs>
                 </Toolbar>
             </AppBar>
             <main>
