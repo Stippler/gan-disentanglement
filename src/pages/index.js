@@ -60,9 +60,6 @@ export default function Home() {
             <Grid item>
               <VideosContainer/>
             </Grid>
-            <Grid item xs={12}>
-              <ButtonBases />
-            </Grid>
             <Grid item>
               <Typography variant="body1" color="text.secondary" paragraph>
                 Welcome to our project, an in-depth exploration of GAN disentanglement led by Katharina Scheucher and Christian Stippel. As part of the Visualization 2 university course, this web application aims to elucidate the intricate mechanics of Generative Adversarial Networks (GANs) and the fascinating realm of disentanglement.
@@ -75,6 +72,14 @@ export default function Home() {
                 Trom there, we developed our own unique concept.
               </Typography>
             </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Demo</Typography></Divider>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <ButtonBases />
+            </Grid>
+            
           </Grid>
           <Divider sx={{ my: 4 }} textAlign="left"><Typography variant='h5'>Overview Implementation</Typography></Divider>
           <Grid container spacing={2}>
