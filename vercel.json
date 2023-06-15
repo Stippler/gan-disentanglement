@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "src/pages/api/total-walks.js": { "includeFiles": "", "excludeFiles": "**/*" },
-    "src/pages/api/walk.js": { "includeFiles": "", "excludeFiles": "**/*" },
-    "src/pages/api/walks.js": { "includeFiles": "", "excludeFiles": "**/*" },
-    "src/pages/api/walksdb.js": { "includeFiles": "", "excludeFiles": "**/*" }
-  }
-}

@@ -58,11 +58,18 @@ const useWalk = create((set, get) => ({
 
         try {
             const { space, direction, walk } = get();
-            const response = await fetch(`/api/walk?space=${space}&direction=${direction}&walk=${walk}`, { signal: controller.signal });
+            const chunk = Math.floor(walk / 10);
+            const url = process.env.NODE_ENV === 'production'
+                ? `https://gan-disentanglement.vercel.app/chunks/${space}/${direction}/${chunk}.json`
+                : `http://localhost:3000/chunks/${space}/${direction}/${chunk}.json`;
+
+            const response = await fetch(url, { signal: controller.signal });
+            // const response = await fetch(`/api/walk?space=${space}&direction=${direction}&walk=${walk}`, { signal: controller.signal });
 
             if (!response.ok) throw new Error("Network response was not ok");
 
-            const walkData = await response.json();
+            let walks = await response.json();
+            let walkData = walks[walk % 10];
 
             set(produce(state => {
                 state.walkData = walkData;
